@@ -28,7 +28,7 @@ describe Entry do
 
   context '#add' do
     it 'POSTs a new definition to Wiktionary' do
-      stub = stub_request(:post, "http://localhost:3000/wiktionary").
+      stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"cat\",\"definition\":\"opposite of dog\"}"=>true}).
          to_return(:status => 200, :body => "")
 
@@ -41,7 +41,7 @@ describe Entry do
 
   context '#delete' do
     it 'DELETEs an entry in Wiktionary' do 
-     stub = stub_request(:delete, "http://localhost:3000/wiktionary/5190069").
+     stub = stub_request(:delete, "http://localhost:3000/entries/5190069").
        to_return(:status => 200, :body => "") 
       dictionary_entry = {'word' => 'cat', 'definition' => 'opposite of dog', 'id' => '5190069'}
       entry_to_delete = Entry.new(dictionary_entry)
@@ -53,63 +53,68 @@ describe Entry do
 
   context '.find' do 
     it 'GETs a word and definition pair' do 
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"cat\",\"definition\":\"opposite of dog\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'cat', 'definition' => 'opposite of dog'}
       Entry.create(dictionary_entry)
 
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"dog\",\"definition\":\"opposite of cat\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'dog', 'definition' => 'opposite of cat'}
       Entry.create(dictionary_entry)
 
-      stub = stub_request(:get, "http://localhost:3000/wiktionary").
+      stub = stub_request(:get, "http://localhost:3000/entries").
         to_return(:status => 200, :body => "[{\"word\":\"cat\",\"definition\":\"opposite of dog\"}, {\"word\":\"dog\",\"definition\":\"opposite of cat\"}]") 
-      Entry.find('cat').definition.should eq 'opposite of dog'
+     p entry = Entry.find('cat')
+      entry.definition.should eq 'opposite of dog'
     end
   end
 
   context '.list' do
     it 'returns an array of all the words and definitions in Wiktionary' do 
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"cat\",\"definition\":\"opposite of dog\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'cat', 'definition' => 'opposite of dog'}
       Entry.create(dictionary_entry)
 
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"dog\",\"definition\":\"opposite of cat\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'dog', 'definition' => 'opposite of cat'}
       Entry.create(dictionary_entry)
 
-      stub = stub_request(:get, "http://localhost:3000/wiktionary").
-        to_return(:status => 200, :body => "[{\"word\":\"cat\",\"definition\":\"opposite of dog\"}, {\"word\":\"dog\",\"definition\":\"opposite of cat\"}]") 
+      stub = stub_request(:get, "http://localhost:3000/entries").
+        to_return(:status => 200, :body => 
+          "[{\"entry\"=>{\"word\":\"cat\",\"definition\":\"opposite of dog\"}},{\"entry\"=>{\"word\":\"dog\",\"definition\":\"opposite of cat\"}}]")
+           [{"entry"=>{"created_at"=>"2013-03-25T23:21:41Z", "definition"=>"dogs best friend", "id"=>1, "updated_at"=>"2013-03-25T23:21:41Z", "word"=>"cat"}}, {"entry"=>{"created_at"=>"2013-03-25T23:26:42Z", "definition"=>"dogs best friend", "id"=>2, "updated_at"=>"2013-03-25T23:26:42Z", "word"=>"cat"}}] 
+      p dictionary_entry
+      # entries.each {|entry| puts "#{entry.id}  #{entry.word}:  #{entry.definition}"}
       Entry.list.first.word.should eq "cat"
     end
   end
 
   context '#update' do
     it 'allows you to edit word or definition' do
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"cat\",\"definition\":\"opposite of dog\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'cat', 'definition' => 'opposite of dog'}
       Entry.create(dictionary_entry)
 
-     stub = stub_request(:post, "http://localhost:3000/wiktionary").
+     stub = stub_request(:post, "http://localhost:3000/entries").
          with(:body => {"{\"word\":\"dog\",\"definition\":\"opposite of cat\"}"=>true}).
          to_return(:status => 200, :body => "")
       dictionary_entry = {'word' => 'dog', 'definition' => 'opposite of cat'}
       Entry.create(dictionary_entry)
 
-      stub = stub_request(:get, "http://localhost:3000/wiktionary").
+      stub = stub_request(:get, "http://localhost:3000/entries").
         to_return(:status => 200, :body => "[{\"word\":\"cat\",\"definition\":\"opposite of dog\"}, {\"word\":\"dog\",\"definition\":\"opposite of cat\"}]") 
  
       entry = Entry.find('cat')
-      stub = stub_request(:put, "http://localhost:3000/wiktionary").
+      stub = stub_request(:put, "http://localhost:3000/entries").
         with(:body => {"{\"definition\":\"mans best friend\"}"=>true},
       :headers => {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'User-Agent'=>'Faraday v0.8.7'}).
         to_return(:status => 200, :body => "") 

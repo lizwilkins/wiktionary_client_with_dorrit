@@ -1,0 +1,10 @@
+#require 'rspec'
+require 'active_record'
+require 'json'
+require 'shoulda-matchers'
+#require 'webmock/rspec'
+require 'faraday'
+require 'pry-debugger'
+require 'pry'
+
+require './lib/entry'

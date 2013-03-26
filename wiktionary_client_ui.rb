@@ -1,56 +1,76 @@
 require './ui_helper'
 
-puts "Welcome!"
-choice == nil
-until choice == 'y'
-  puts "Press ENTER to skip an option."
+puts "\n\nWelcome!"
+choice = nil
+until choice == 'x'
+  puts "\nWhat would you like to do?"
+  puts "'f' to look up a word"
+  puts "'l' to list all words"
+  puts "'d' to delete a word"
+  puts "'a' to add a word"
+  puts "'u' to update a word"
+  puts "'x' to exit"
 
-  print "Look up a word (y/n): "
-  if gets.chomp == 'y'
-    Entry.find('word' => gets.chomp)  # errors
-  end
+  case choice = gets.chomp
+  when 'f'
+      print "Enter a word: "
+      entries = Entry.find('word' => gets.chomp)  # errors
+      entries.each {|entry| puts "#{entry.word}:  #{entry.definition}"}  # errors
 
-  print "List all words (y/n): "
-  if gets.chomp == 'y'
-    Entry.list  # errors
-  end
+  when 'l'
+      entries = Entry.list
+      puts "ID  Word       Definition"
+      entries.each {|entry| puts "#{entry.id}  #{entry.word}:  #{entry.definition}"}  # errors
   
-  print "Delete a word (y/n): "
-   if gets.chomp == 'y'
-    Entry.new('id' => gets.chomp).delete
-  end
- 
-  print "Update an entry (y/n): "
-   if gets.chomp == 'y'
-    puts "What word would you like to update?"
-    modified_entry = Entry.find(gets.chomp)
-    word = modified_entry.word
-    definition = modified_entry.definition
-    puts "Would you like to edit the word(w) or the definition (d)?"
-    choice = gets.chomp
-    case choice
-    when 'w'
-      puts 'what is the updated word for this entry?'
+  when 'd'
+    entries = Entry.list
+      puts "ID  Word       Definition"
+      entries.each {|entry| puts "#{entry.id}  #{entry.word}:  #{entry.definition}"}
+      print "What word would you like to delete(enter ID):  "
+      Entry.find(gets.chomp)
+      print "Are you sure you want to delete '#{entry.word}' (y/n)?"
+      if gets.chomp == 'y'
+        Entry.new('id' => gets.chomp).delete
+      end
+
+   when 'u'  
+      entries = Entry.list
+      puts "ID  Word       Definition"
+      entries.each {|entry| puts "#{entry.id}  #{entry.word}:  #{entry.definition}"}
+      print "What word would you like to update(enter word):  "
+      entry = Entry.find(gets.chomp)
+      word = entry.word
+      definition = entry.definition
+      puts "Would you like to edit the word(w) or the definition (d)?"
+      choice = gets.chomp
+      case choice
+      when 'w'
+        puts 'what is the updated word for this entry?'
+        word = gets.chomp
+      when 'd'
+        puts 'What is the updated definition for this entry?'
+        definition = gets.chomp
+      end
+      print "Are you sure you want to update '#{entry.word}' (y/n)?"
+      if gets.chomp == 'y'
+        #modified_entry = Entry.new('id' => entry.id, 'word' => word, 'definition' => definition)  # errors
+        entry.update('id' => entry.id, 'word' => word, 'definition' => definition)
+      end
+
+    when 'a'
+      print "Enter a new word: "
       word = gets.chomp
-    when 'd'
-      puts 'What is the updated definition for this entry?'
+      print "Enter a definition for #{word}: "
       definition = gets.chomp
+      Entry.create('word' => word, 'definition' => definition)
+      # puts "Here is your entry: "
+      # print "#{new_entry.word}: #{new_entry.definition}"
+      # print "Add to Wiktionary (y/n): "
+      # if gets.chomp == 'y'
+      #   new_entry.add  # errors
+      # end
+    when 'x'
+      break
     end
-    modified_entry.update('word' => word, 'definition' => definition)  # errors
-  end
- 
-  print "Enter a new word: "
-  word = gets.chomp
-  print "Enter a definition for #{word}: "
-  definition = gets.chomp
-  Entry.new('word' => word, 'definition' => definition)
-  # puts "Here is your entry: "
-  # print "#{new_entry.word}: #{new_entry.definition}"
-  # print "Add to Wiktionary (y/n): "
-  # if gets.chomp == 'y'
-  #   new_entry.add  # errors
-  # end
-  puts "Do you want to exit (y/n): "
-  choice = gets.chomp
 end
   
