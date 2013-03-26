@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'rspec'
+gem 'activerecord'
+gem 'json'
+gem 'shoulda-matchers'
+gem 'webmock'
+gem 'faraday'
+gem 'pry'
+gem 'pry-debugger'
